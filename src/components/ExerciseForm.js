@@ -4,16 +4,13 @@ class ExerciseForm extends React.Component{
 
     state = {}
 
-    handleSubmit =(e)=> {
-        e.preventDefault();
-    }
-
     render() {
-        const { onChange, form } = this.props
+        const { onChange,onSubmit, form } = this.props
     return(
         <div className="container">
             <form 
-                onSubmit={this.handleSubmit}
+                onSubmit={onSubmit}
+                className='mt-3'
             >
                 <div className="form-group">
                     <input 
@@ -70,7 +67,7 @@ class ExerciseForm extends React.Component{
                 
                 <button 
                     type="submit" 
-                    className="btn btn-primary"
+                    className="btn btn-primary mt-3"
                 >
                     Submit
                 </button>
