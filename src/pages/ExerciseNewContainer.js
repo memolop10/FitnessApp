@@ -1,25 +1,32 @@
-import React from 'react'
+import React, { useState }from 'react'
 import FatalError from './500'
 import ExercisesNew from '../pages/ExercisesNew'
+import Loading from '../components/Loading'
+import url from '../config'
 
-class ExerciseNewContainer extends React.Component{
+
+const ExerciseNewContainer = ({history}) => {
    
-    state= {
-        form: {
-            title:'', 
-            description:'', 
-            img:'', 
-            leftColor:'', 
-            rightColor:''
-         },
-         loading:false,
-         error:null
+    const [form, setForm ] = useState({title:'', 
+                                        description:'', 
+                                        img:'', 
+                                        leftColor:'', 
+                                        rightColor:''})
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+    
+    const handleChange = (e) => {
+        setForm({
+                ...form,
+                [e.target.name]:e.target.value
+        })
     }
 
-    handleSubmit = async (e)=> {
-        this.setState({
-            loading:true
-        })
+     
+
+    const handleSubmit = async (e) => {
+        setLoading(true)
         e.preventDefault();
         try{
             let config = {
@@ -28,45 +35,33 @@ class ExerciseNewContainer extends React.Component{
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body:JSON.stringify(this.state.form)
+                body:JSON.stringify(form)
             }
-            let res = await fetch('http://localhost:8000/api/exercises', config)
-            let json = await res.json()
+            await fetch(`${url}/exercises`, config)
+            setLoading(false)
+            history.push('/')
 
-            this.setState({
-                loading:false
-            })
-
-            this.props.history.push('/')
-            console.log(json)
         }catch(error){
-            this.setState({
-                loading:false,
-                error
-            })
+            
+                setLoading(false)
+                setError(error)
+        
         }
     }
 
+    if(loading)
+        return <Loading />
 
-    handleChange = (e) => {
-        this.setState({
-            form:{
-                ...this.state.form,
-                [e.target.name]:e.target.value
-            }
-        })
-     }
- 
+    if(error)
+    return <FatalError />
 
-    render(){
-        if(this.state.error)
-            return <FatalError />
-
-        return <ExercisesNew 
-            onSubmit={this.handleSubmit}
-            onChange={this.handleChange}
-            form={this.state.form}/>
-    }
+    return <ExercisesNew 
+            onSubmit={handleSubmit}
+            onChange={handleChange}
+            form={form}/>
 }
+
+       
+
 
 export default ExerciseNewContainer
